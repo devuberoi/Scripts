@@ -1,11 +1,16 @@
 # AUTHOR : DEV UBEROI || twitter: @devuberoi
-# THIS SCRIPT IS ONLY FOR EXTRACTING DATA FROM http://eduraft.com
-# ONLY FOR PERSONAL USE, THE AUTHOR DOES NOT HOLD ANY RESPOSIBILITY OF ANY UNWATED/UNDESIRED USE OF THIS SCRIPT
+# THIS SCRIPT IS ONLY FOR EXTRACTING DATA FROM "http://eduraft.com"
+# ONLY FOR PERSONAL USE
+# THE AUTHOR DOES NOT HOLD ANY RESPOSIBILITY OF ANY UNWATED/UNDESIRED USE OF THIS SCRIPT
+# REQUIREMENTS : python 2.7.3+ (i have tested only on this version, should work on above this)
+# PACKAGES : lxml , xlwt, xlrd, requests (can be installed through 'pip')
 
 from xlwt import Workbook
 import lxml.html
 import requests
 import sys
+
+# the url is broken in two parts to loop it through several pages
 
 URL1 = "http://eduraft.com/school/Delhi/Delhi/"
 URL2 = "/%3Cfilter%3ErankTier%5B%5D=A&rankTier%5B%5D=B&mediumformfilter%5B%5D=English&ownershipformfilter%5B%5D=Private+School&typeformfilter%5B%5D=Boys&typeformfilter%5B%5D=Co-Education&typeformfilter%5B%5D=Girls&classes_toformfilter%5B%5D=12%3Cfilter%3E"
@@ -23,24 +28,26 @@ def main():
 			url = URL1+str(i)+URL2
 			req = requests.get(url)
 			doc = lxml.html.fromstring(req.content)
-			content = doc.xpath('//span[@itemprop="name"]/text()')
-			content2 = doc.xpath('//span[@itemprop="streetAddress"]/p/text()')
-			content3 = doc.xpath('//div[@class="smallAlertText js-school-search-result-street"]/p/a/text()')
-			content4 = doc.xpath('//span[@itemprop="description"]/text()')
-			c1 = len(content)
-			c3 = len(content3)
+			schoolname = doc.xpath('//span[@itemprop="name"]/text()')
+			schooladdress = doc.xpath('//span[@itemprop="streetAddress"]/p/text()')
+			schoolwebsite = doc.xpath('//div[@class="smallAlertText js-school-search-result-street"]/p/a/text()')
+			schoolyear = doc.xpath('//span[@itemprop="description"]/text()')
+			l1 = len(schoolname)
+			l2 = len(schoolwebsite)
 			year = 3
 
-			for x in range(0,c1):
-				writesheet.write(r1,0,content[x])
-				writesheet.write(r1,1,content2[x])
-				writesheet.write(r1,2,content4[year])
+			for x in range(0,l1):
+				writesheet.write(r1,0,schoolname[x])
+				writesheet.write(r1,1,schooladdress[x])
+				writesheet.write(r1,2,schoolyear[year])
 				year = year+5
 				r1 = r1+1
 
-			for t in range(0,c3):
-				writesheet2.write(r2,0,content3[t])
+			for x in range(0,l2):
+				writesheet2.write(r2,0,schoolwebsite[x])
 				r2 = r2+1
+
+# the IndexErrors have been skipped because the last page of the results on eduraft may or may-not contain 8 results
 
 	except IndexError:
 		pass
